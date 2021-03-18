@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import data_access.InputOutputOperations;
+import utilities.Date;
+import utilities.UnauthorizedUserOperationException;
 import utilities.UserType;
 
 public class Mediator implements IMediator {
@@ -88,11 +90,25 @@ public class Mediator implements IMediator {
 		List<Team> teams = getTeams();
 		teams.add(team);
 	}
+	
+	@Override
+	public Team createTeam(String teamName, String teamID) throws UnauthorizedUserOperationException {
+		User currentUser = getCurrentUser();
+		if(currentUser.getUserType() != UserType.INSTRUCTOR) {
+			throw new UnauthorizedUserOperationException("Unauthorized.");
+		}
+		Team team = new Team(teamName, teamID, currentUser);
+		addTeam(team);
+		return team;
+	}
 
 	@Override
-	public Team removeTeam(String teamID) {
+	public Team removeTeam(String teamID) throws UnauthorizedUserOperationException {
 		Team teamToRemove = getTeam(teamID);
 		List<Team> teams = getTeams();
+		if(!teamToRemove.isUserOwner(getCurrentUser())) {
+			throw new UnauthorizedUserOperationException("Unauthorized.");
+		}
 		teams.remove(teamToRemove);
 		return teamToRemove;
 	}
@@ -110,18 +126,29 @@ public class Mediator implements IMediator {
 		team.removeMembersFromPrivateChannel(channelID, memberIDs);
 		return team;
 	}
-
+	
 	@Override
-	public Team addMeetingChannelToTeam(String teamID, Channel newChannel) {
-		Team team = getTeam(teamID);
-		team.addMeetingChannel(newChannel);
-		return team;
+	public Channel addMeetingChannelToTeam(Team team, String channelName, Date meetingDate) {
+		Channel channel = new MeetingChannel(channelName, meetingDate);
+		team.addMeetingChannel(channel);
+		return channel;
 	}
-
+	
 	@Override
-	public Channel removeMeetingChannelFromTeam(String teamID, int channelID) {
-		Team team = getTeam(teamID);
+	public Channel removeMeetingChannelFromTeam(Team team, int channelID) {
 		return team.removeMeetingChannel(channelID);
+	}
+	
+	@Override
+	public Channel addPrivateChannelToTeam(Team team, String channelName) {
+		Channel channel = new PrivateChannel(channelName, getCurrentUser());
+		team.addPrivateChannel(channel);
+		return channel;
+	}
+	
+	@Override
+	public Channel removePrivateChannelFromTeam(Team team, int channelID) {
+		return team.removePrivateChannel(channelID);
 	}
 
 	@Override
@@ -145,7 +172,7 @@ public class Mediator implements IMediator {
 	}
 
 	@Override
-	public User removeMemberFromTeam(String teamID, int userID) {
+	public Team removeMemberFromTeam(String teamID, int userID) {
 		Team team = getTeam(teamID);
 		team.removeMember(userID);
 		return team;
@@ -271,5 +298,34 @@ public class Mediator implements IMediator {
 			}
 		}
 		return teamsWithCurrentUser;
+	}
+	
+	@Override
+	public boolean teamContainsUser(User user, Team team) {
+		return team.containsUser(user);
+	}
+	
+	@Override
+	public boolean isUserOwnerOfTeam(User user, Team team) {
+		return team.isUserOwner(user);
+	}
+	
+	@Override
+	public boolean isUserOwnerOfChannel(User user, Team team, int channelID) {
+		Channel channel = team.getChannel(channelID);
+		User owner = ((PrivateChannel) channel).getChannelOwner();
+		return user.getUserID() == owner.getUserID();
+	}
+	
+	@Override
+	public List<Channel> channelsContainingUserInTeam(User user, Team team) {
+		List<Channel> channels = team.getChannels();
+		List<Channel> channelsToReturn = new ArrayList<Channel>();
+		for (Channel channel : channels) {
+			if(channel.getMembers().contains(user)) {
+				channelsToReturn.add(channel);
+			}
+		}
+		return channelsToReturn;
 	}
 }

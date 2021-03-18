@@ -12,6 +12,26 @@ public class Team {
 	private Channel defaultMeetingChannel;
 	private List<Channel> channels;
 	
+	public Team(String teamName, String teamID, User creator) {
+		setTeamName(teamName);
+		setTeamID(teamID);
+		
+		List<User> members = new ArrayList<User>();
+		members.add(creator);
+		setMembers(members);
+		
+		List<User> teamOwners = new ArrayList<User>();
+		teamOwners.add(creator);
+		setTeamOwners(teamOwners);
+		
+		Channel defaultMeetingChannel = new MeetingChannel("General");
+		setDefaultMeetingChannel(defaultMeetingChannel);
+		
+		List<Channel> channels = new ArrayList<Channel>();
+		channels.add(defaultMeetingChannel);
+		setChannels(channels);
+	}
+	
 	public Team(String teamName, String teamID, List<User> teamOwners, Channel defaultMeetingChannel, List<Channel> channels, List<User> members) {
 		setTeamName(teamName);
 		setTeamID(teamID);
@@ -92,6 +112,14 @@ public class Team {
 	}
 	
 	public Channel removeMeetingChannel(int channelID) {
+		return null;
+	}
+	
+	public void addPrivateChannel(Channel newChannel) {
+		
+	}
+	
+	public Channel removePrivateChannel(int channelID) {
 		return null;
 	}
 	
@@ -199,7 +227,7 @@ public class Team {
 		this.members = members;
 	}
 
-	public boolean containsUser(User user){
+	public boolean containsUser(User user) {
 		for(User teamUser:members){
 			if(teamUser.equals(user))
 				return true;
@@ -207,6 +235,16 @@ public class Team {
 		for(User teamUser:teamOwners){
 			if(teamUser.equals(user))
 				return true;
+		}
+		return false;
+	}
+	
+	public boolean isUserOwner(User user) {
+		List<User> owners = getTeamOwners();
+		for (User owner : owners) {
+			if(owner.getUserID() == user.getUserID()) {
+				return true;
+			}
 		}
 		return false;
 	}

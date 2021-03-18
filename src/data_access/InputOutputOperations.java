@@ -33,7 +33,7 @@ public class InputOutputOperations {
 				UserType type;
 				if(values[0].equals("Student"))
 					type = UserType.STUDENT;
-				else if(values[0].equals("Teaching"))
+				else if(values[0].equals("Teaching Assistant"))
 					type = UserType.TEACHING_ASSISTANT;
 				else
 					type = UserType.INSTRUCTOR;
@@ -118,10 +118,10 @@ public class InputOutputOperations {
 					channels.add(channel1);
 				Team team = new Team(name,teamId,owners,channel,channels,members);
 				teams.add(team);
-				for(String s: values){
-					System.out.print(s + "| ");
-				}
-				System.out.println();
+//				for(String s: values){
+//					System.out.print(s + "| ");
+//				}
+//				System.out.println();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

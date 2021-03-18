@@ -7,12 +7,12 @@ public class PrivateChannel extends Channel {
 
 	private User channelOwner;
 	
-	public PrivateChannel(User channelOwner) {
-		super(new ArrayList<User>());
+	public PrivateChannel(String name, User channelOwner) {
+		super(name);
 		setChannelOwner(channelOwner);
 	}
 	
-	public PrivateChannel(User channelOwner, List<User> members) {
+	public PrivateChannel(String name, User channelOwner, List<User> members) {
 		super(members);
 		setChannelOwner(channelOwner);
 	}

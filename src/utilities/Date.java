@@ -12,6 +12,10 @@ public class Date {
 		this.minute = 0;	
 	}
 	
+	public Date(String str) {
+		//PARSE STRING HERE
+	}
+	
 	public Date(DayOfTheWeek day, int hour, int minute) {
 		this.day = day;
 		this.hour = hour;
