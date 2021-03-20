@@ -14,6 +14,31 @@ public class Date {
 	
 	public Date(String str) {
 		//PARSE STRING HERE
+		String[] splitStr = str.split("\\s+");
+		String day = splitStr[0];
+		String time = splitStr[1];
+		DayOfTheWeek dayOfTheWeek;
+		if(day.equals("Monday"))
+			dayOfTheWeek = DayOfTheWeek.MONDAY;
+		else if(day.equals("Tuesday"))
+			dayOfTheWeek = DayOfTheWeek.TUESDAY;
+		else if(day.equals("Wednesday"))
+			dayOfTheWeek = DayOfTheWeek.WEDNESDAY;
+		else if(day.equals("Thursday"))
+			dayOfTheWeek = DayOfTheWeek.THURSDAY;
+		else if(day.equals("Friday"))
+			dayOfTheWeek = DayOfTheWeek.FRIDAY;
+		else if(day.equals("Saturday"))
+			dayOfTheWeek = DayOfTheWeek.SATURDAY;
+		else
+			dayOfTheWeek = DayOfTheWeek.SUNDAY;
+
+		String[] splitStr2 = splitStr[1].split(":");
+		int hour = Integer.parseInt(splitStr2[0]);
+		int minute = Integer.parseInt(splitStr2[1]);
+		this.day = dayOfTheWeek;
+		this.hour = hour;
+		this.minute = minute;
 	}
 	
 	public Date(DayOfTheWeek day, int hour, int minute) {

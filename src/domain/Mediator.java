@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import data_access.InputOutputOperations;
-import utilities.Date;
-import utilities.UnauthorizedUserOperationException;
-import utilities.UserType;
+import utilities.*;
 
 public class Mediator implements IMediator {
 
@@ -135,8 +133,8 @@ public class Mediator implements IMediator {
 	}
 	
 	@Override
-	public Channel removeMeetingChannelFromTeam(Team team, int channelID) {
-		return team.removeMeetingChannel(channelID);
+	public Channel removeMeetingChannelFromTeam(Team team, String channelName) {
+		return team.removeMeetingChannel(channelName);
 	}
 	
 	@Override
@@ -147,8 +145,8 @@ public class Mediator implements IMediator {
 	}
 	
 	@Override
-	public Channel removePrivateChannelFromTeam(Team team, int channelID) {
-		return team.removePrivateChannel(channelID);
+	public Channel removePrivateChannelFromTeam(Team team, String channelName) {
+		return team.removePrivateChannel(channelName);
 	}
 
 	@Override
@@ -173,8 +171,8 @@ public class Mediator implements IMediator {
 
 	@Override
 	public Team removeMemberFromTeam(String teamID, int userID) {
+		getTeam(teamID).removeMember(userID);
 		Team team = getTeam(teamID);
-		team.removeMember(userID);
 		return team;
 	}
 
@@ -252,20 +250,21 @@ public class Mediator implements IMediator {
 					userTeams.add(team);
 			}
 		}
-		return teams;
+		return userTeams;
 	}
 	
 	@Override
-	public User getUserFromEmailAndPassword(String email, String password) {
+	public User getUserFromEmailAndPassword(String email, String password) throws PasswordIncorrectException, NotFoundException {
 		List<User> users = getUsers();
 		for (User user : users) {
 			if(user.getEmail().equals(email)) {
 				if(user.getPassword().equals(password)) {
 					return user;
-				}
+				}else
+					throw new PasswordIncorrectException();
 			}
 		}
-		return null;
+		throw new NotFoundException();
 	}
 
 	@Override
@@ -311,8 +310,8 @@ public class Mediator implements IMediator {
 	}
 	
 	@Override
-	public boolean isUserOwnerOfChannel(User user, Team team, int channelID) {
-		Channel channel = team.getChannel(channelID);
+	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) {
+		Channel channel = team.getChannel(channelName);
 		User owner = ((PrivateChannel) channel).getChannelOwner();
 		return user.getUserID() == owner.getUserID();
 	}
@@ -327,5 +326,14 @@ public class Mediator implements IMediator {
 			}
 		}
 		return channelsToReturn;
+	}
+
+	@Override
+	public Team findChannelTeam(Channel channel) {
+		for(Team team: teams){
+			if(team.getChannels().contains(channel))
+				return team;
+		}
+		return null;
 	}
 }

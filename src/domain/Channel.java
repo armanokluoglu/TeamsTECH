@@ -10,6 +10,7 @@ public abstract class Channel {
 	private String name;
 	private List<User> members;
 	private int channelID;
+	private Team team;
 	private static int channelIDCounter = 0;
 	
 	public Channel(String name) {

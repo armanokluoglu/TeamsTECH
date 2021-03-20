@@ -18,15 +18,17 @@ public class TeamsTechApp {
     public static void main(String[] args) {
 
     	TeamsTECH app = new TeamsTECH();
-    	app.start();
-    	
+        app.start();
+
 //        InputOutputOperations inputOutputOperations = new InputOutputOperations();
 //        List<User> users = inputOutputOperations.fillUserList("xxx");
 //        List<Team> teams = inputOutputOperations.fillTeamList("ccc");
 //        IMediator mediator = new Mediator(teams,users,inputOutputOperations);
 //
+//        inputOutputOperations.fillTeamChannels(mediator,"vvvv");
 //        inputOutputOperations.matchUsersAndTeams(users,teams,mediator);
 //        inputOutputOperations.outputUserCsv(mediator);
+//        inputOutputOperations.outputChannelsCsv(mediator);
     }
 
 

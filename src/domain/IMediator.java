@@ -3,7 +3,10 @@ package domain;
 import java.util.List;
 
 import data_access.InputOutputOperations;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
 import utilities.Date;
+import utilities.NotFoundException;
+import utilities.PasswordIncorrectException;
 import utilities.UnauthorizedUserOperationException;
 
 public interface IMediator {
@@ -14,9 +17,9 @@ public interface IMediator {
 	public Team addMembersToPrivateChannelOfTeam(String teamID, int channelID, int[] memberIDs);
 	public Team removeMembersFromPrivateChannelOfTeam(String teamID, int channelID, int[] memberIDs);
 	public Channel addMeetingChannelToTeam(Team team, String channelName, Date meetingDate);
-	public Channel removeMeetingChannelFromTeam(Team team, int channelID);
+	public Channel removeMeetingChannelFromTeam(Team team, String channelName);
 	public Channel addPrivateChannelToTeam(Team team, String channelName);
-	public Channel removePrivateChannelFromTeam(Team team, int channelID);
+	public Channel removePrivateChannelFromTeam(Team team, String channelName);
 	public Team addMemberToChannelOfTeam(String teamID, int channelID, int userID);
 	public User removeMemberFromChannelOfTeam(String teamID, int channelID, int userID);
 	public Team addMemberToTeam(String teamID, User newMember);
@@ -37,11 +40,13 @@ public interface IMediator {
 	public void setCurrentUser(User currentUser);
 	public InputOutputOperations getIO();
 	public void setIO(InputOutputOperations io);
-	public User getUserFromEmailAndPassword(String email, String password);
+	public User getUserFromEmailAndPassword(String email, String password) throws NotFoundException, PasswordIncorrectException;
 	
 	public List<Team> getTeamsWithCurrentUser();
 	public boolean teamContainsUser(User user, Team team);
 	public boolean isUserOwnerOfTeam(User user, Team team);
-	public boolean isUserOwnerOfChannel(User user, Team team, int channelID);
+	public boolean isUserOwnerOfChannel(User user, Team team, String channelName);
 	public List<Channel> channelsContainingUserInTeam(User user, Team team);
+
+	public Team findChannelTeam(Channel channel);
 }

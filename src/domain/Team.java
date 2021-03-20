@@ -23,7 +23,8 @@ public class Team {
 		List<User> teamOwners = new ArrayList<User>();
 		teamOwners.add(creator);
 		setTeamOwners(teamOwners);
-		
+
+		channels = new ArrayList<>();
 		Channel defaultMeetingChannel = new MeetingChannel("General");
 		setDefaultMeetingChannel(defaultMeetingChannel);
 		
@@ -53,6 +54,7 @@ public class Team {
 	public void addMember(User member) {
 		List<User> members = getMembers();
 		members.add(member);
+		addMemberToChannel(defaultMeetingChannel.getChannelID(),member.getUserID());
 	}
 	
 	public User removeMember(int userID) {
@@ -108,19 +110,24 @@ public class Team {
 	}
 
 	public void addMeetingChannel(Channel newChannel) {
-		
+		channels.add(newChannel);
 	}
 	
-	public Channel removeMeetingChannel(int channelID) {
-		return null;
+	public Channel removeMeetingChannel(String channelName) {
+
+		Channel channel = getChannel(channelName);
+		getChannels().remove(channel);
+		return channel;
 	}
 	
 	public void addPrivateChannel(Channel newChannel) {
-		
+		channels.add(newChannel);
 	}
 	
-	public Channel removePrivateChannel(int channelID) {
-		return null;
+	public Channel removePrivateChannel(String channelName) {
+		Channel channel = getChannel(channelName);
+		getChannels().remove(channel);
+		return channel;
 	}
 	
 	public String getTeamName() {

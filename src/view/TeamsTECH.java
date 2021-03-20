@@ -1,5 +1,7 @@
 package view;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -9,9 +11,7 @@ import domain.IMediator;
 import domain.Mediator;
 import domain.Team;
 import domain.User;
-import utilities.Date;
-import utilities.UnauthorizedUserOperationException;
-import utilities.UserType;
+import utilities.*;
 
 public class TeamsTECH {
 	//dilekozturk@iyte.edu.tr 1a2b
@@ -20,16 +20,23 @@ public class TeamsTECH {
         List<User> users = inputOutputOperations.fillUserList("xxx");
         List<Team> teams = inputOutputOperations.fillTeamList("ccc");
 		IMediator med = new Mediator(teams, users, inputOutputOperations);
+		inputOutputOperations.matchUsersAndTeams(users,teams,med);
+		inputOutputOperations.fillTeamChannels(med,"vvv");
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("=========================================");
 		System.out.println("=============== TeamsTECH ===============");
 		System.out.println("=========================================\n");
-		login(med, scanner);
-		UserType userType = med.getCurrentUser().getUserType();
-		mainMenu(med, scanner, userType);
+		try {
+			login(med, scanner);
+			UserType userType = med.getCurrentUser().getUserType();
+			mainMenu(med, scanner, userType);
+		}catch (NotFoundException |  PasswordIncorrectException e){
+			System.out.println("User Not Found or password is wrong");
+			start();
+		}
 	}
 	
-	private void login(IMediator med, Scanner scanner) {
+	private void login(IMediator med, Scanner scanner) throws NotFoundException, PasswordIncorrectException {
 		System.out.println("================= Login =================");
 		System.out.print("Please enter your E-Mail adress: ");
 		String email = scanner.next();
@@ -40,6 +47,9 @@ public class TeamsTECH {
 		System.out.println("What would you like to do?");
 		med.setCurrentUser(currentUser);
 		return;
+
+
+
 	}
 	
 	private void mainMenu(IMediator med, Scanner scanner, UserType userType) {
@@ -78,6 +88,9 @@ public class TeamsTECH {
 				createTeamMenu(med, scanner, userType);
 				break;
 			case 9:
+				med.getIO().outputUserCsv(med);
+				med.getIO().outputTeamsCsv(med);
+				med.getIO().outputChannelsCsv(med);
 				start();
 				break;
 			default:
@@ -97,9 +110,13 @@ public class TeamsTECH {
 	private void joinTeamMenu(IMediator med, Scanner scanner, UserType userType) {
 		System.out.print("Please enter the ID of the team you want to join: ");
 		String teamToJoin = scanner.next();
-		Team joinedTeam = med.addMemberToTeam(teamToJoin, med.getCurrentUser());
-		System.out.println("Joined team " + joinedTeam.getTeamName() + ".");
-		mainMenu(med, scanner, userType);
+		Team team = med.findTeamById(teamToJoin);
+		if(team!=null){
+			Team joinedTeam = med.addMemberToTeam(teamToJoin, med.getCurrentUser());
+			System.out.println("Joined team " + joinedTeam.getTeamName() + ".");
+			mainMenu(med, scanner, userType);
+		}else
+			System.out.println("Wrong team Id");
 	}
 	
 	private void printTeams(IMediator med, Scanner scanner, UserType userType) {
@@ -118,12 +135,14 @@ public class TeamsTECH {
 		}
 		System.out.print("Please enter the ID of the team you want to delete: ");
 		String teamToDelete = scanner.next();
-		Team removedTeam;
+		Team removedTeam = med.findTeamById(teamToDelete);
 		try {
 			removedTeam = med.removeTeam(teamToDelete);
 			System.out.println("Deleted team " + removedTeam.getTeamName() + ".");
 		} catch (UnauthorizedUserOperationException e) {
 			System.out.println("You don't have permission to do that. Please choose a different option.");
+		}catch (NullPointerException e){
+			System.out.println("Wrong team id");
 		}
 		mainMenu(med, scanner, userType);
 	}
@@ -142,6 +161,9 @@ public class TeamsTECH {
 			System.out.println("Created team " + createdTeam.getTeamName() + " with the ID " + createdTeam.getTeamID() + ".");
 		} catch (UnauthorizedUserOperationException e) {
 			System.out.println("You don't have permission to do that. Please choose a different option.");
+		}catch (IllegalArgumentException e){
+			System.out.println("Team ID cannot be longer than 8 characters.");
+			mainMenu(med,scanner,userType);
 		}
 		mainMenu(med, scanner, userType);
 	}
@@ -159,7 +181,7 @@ public class TeamsTECH {
 		List<User> members = team.getMembers();
 		System.out.println("Members:");
 		for (User user : members) {
-			System.out.println(user.getUserID() + ": " + user.getUserName());
+			System.out.println(user.getUserID() + ": " + user.getName());
 		}
 		teamMenu(med, scanner, userType);
 	}
@@ -169,15 +191,18 @@ public class TeamsTECH {
 			System.out.print("Please enter the name of the private channel you want to create: ");
 			String privateChannelName = scanner.next();
 			Channel createdPrivateChannel = med.addPrivateChannelToTeam(team, privateChannelName);
+			createdPrivateChannel.addMembers(Arrays.asList(med.getCurrentUser()));
 			System.out.println("Channel " + createdPrivateChannel.getName() + " created in team " + team.getTeamName() + ".");
 		} else if(type == "meeting") {
 			if(med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
 				System.out.print("Please enter the name of the meeting channel you want to create: ");
 				String meetingChannelName = scanner.next();
 				System.out.print("Please enter the meeting date (e.g. Monday 13:30): ");
-				String meetingDateString = scanner.next();
+				String meetingDateString = scanner.next() +" ";
+				meetingDateString += scanner.next();
 				Date meetingDate = new Date(meetingDateString);
 				Channel createdMeetingChannel = med.addMeetingChannelToTeam(team, meetingChannelName, meetingDate);
+				createdMeetingChannel.addMembers(Arrays.asList(med.getCurrentUser()));
 				System.out.println("Channel " + createdMeetingChannel.getName() + " created in team " + team.getTeamName() + ".");
 			} else {
 				System.out.print("You don't have permission to create a meeting channel");
@@ -189,9 +214,9 @@ public class TeamsTECH {
 	private void deleteChannelMenu(IMediator med, Scanner scanner, UserType userType, Team team, String type) {
 		if(type == "private") {
 			System.out.print("Please enter the ID of the private channel you want to delete: ");
-			int privateChannelId = scanner.nextInt();
-			if(med.isUserOwnerOfChannel(med.getCurrentUser(), team, privateChannelId)) {
-				Channel removedPrivateChannel = med.removePrivateChannelFromTeam(team, privateChannelId);
+			String channelName = scanner.next();
+			if(med.isUserOwnerOfChannel(med.getCurrentUser(), team, channelName)) {
+				Channel removedPrivateChannel = med.removePrivateChannelFromTeam(team, channelName);
 				System.out.println("Channel " + removedPrivateChannel.getName() + " removed from team " + team.getTeamName() + ".");
 			} else {
 				System.out.println("You are not the owner of this channel.");
@@ -199,8 +224,8 @@ public class TeamsTECH {
 		} else if(type == "meeting") {
 			if(med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
 				System.out.print("Please enter the ID of the meeting channel you want to delete: ");
-				int meetingChannelId = scanner.nextInt();
-				Channel removedMeetingChannel = med.removeMeetingChannelFromTeam(team, meetingChannelId);
+				String  channelName = scanner.next();
+				Channel removedMeetingChannel = med.removeMeetingChannelFromTeam(team, channelName);
 				System.out.println("Channel " + removedMeetingChannel.getName() + " removed from team " + team.getTeamName() + ".");
 			} else {
 				System.out.print("You don't have permission to delete a meeting channel");
@@ -275,11 +300,18 @@ public class TeamsTECH {
 				mainMenu(med, scanner, userType);
 				break;
 			case 9:
+				med.getIO().outputUserCsv(med);
+				med.getIO().outputTeamsCsv(med);
+				med.getIO().outputChannelsCsv(med);
 				start();
 				break;
 			default:
 				System.out.println("Please choose a valid option.");
 				mainMenu(med, scanner, userType);
 		}
+	}
+
+	private void logOut(){
+
 	}
 }
