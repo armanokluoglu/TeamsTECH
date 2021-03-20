@@ -237,10 +237,13 @@ public class TeamsTECH {
 	private void elevateUserMenu(IMediator med, Scanner scanner, UserType userType, Team team) {
 		System.out.print("Enter the ID of the user you want to make team owner: ");
 		int id = scanner.nextInt();
-		if(med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
-			med.elevateMemberToTeamOwnerOfTeam(team.getTeamID(), id);
-		} else {
-			System.out.println("You don't have permission to do that.");
+		User user = med.findUserById(id);
+		if(user!=null){
+			if(med.isUserOwnerOfTeam(med.getCurrentUser(), team) && user.getUserType().equals(UserType.TEACHING_ASSISTANT)) {
+				med.elevateMemberToTeamOwnerOfTeam(team.getTeamID(), id);
+			} else {
+				System.out.println("You don't have permission to do that.");
+			}
 		}
 		teamMenu(med, scanner, userType);
 	}

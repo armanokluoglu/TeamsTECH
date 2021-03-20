@@ -199,7 +199,6 @@ public class InputOutputOperations {
 				String[] values = line.split(",");
 				int userId = Integer.parseInt(values[2]);
 				User user = mediator.findUserById(userId);
-
 				if(values.length>5){
 					for(int i=5;i<values.length;i++){
 						Team team = mediator.getTeam(values[i]);
@@ -214,13 +213,35 @@ public class InputOutputOperations {
 					}
 				}
 			}
-//			List<ParticipantChannel> participantsAndChannels = getParticipantAndChannelFromTeamList("sf");
-//			for(ParticipantChannel participantChannel:participantsAndChannels){
-//				Channel channel = mediator.findChannelByTeamIdAndChannelName(participantChannel.getTeamId(),participantChannel.getChannelName());
-//				if(channel!=null)
-//					mediator.addMemberToChannelOfTeam(participantChannel.getTeamId(),channel.getChannelID(),participantChannel.getParticipantId());
-//			}
-//			System.out.println("");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (BufferedReader br = new BufferedReader(new FileReader("teamsNew.csv"))) {
+			String line;
+			br.readLine();
+			while ((line = br.readLine()) != null) {
+				String[] values = line.split(",");
+				if(values.length>4){
+					String[] userIds = values[4].split(";");
+					List<String> ids = new ArrayList<>();
+					if(userIds.length>0){
+						for(String s: userIds){
+							s = s.replace(String.valueOf('"'), "");
+							s = s.replace(" ", "");
+							ids.add(s);
+						}
+					}
+					for(String id: ids){
+						User owner = mediator.findUserById(Integer.parseInt(id));
+						Team team = mediator.findTeamById(values[1]);
+						if(!team.getTeamOwners().contains(owner))
+							mediator.elevateMemberToTeamOwnerOfTeam(team.getTeamID(),owner.getUserID());
+					}
+				}
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -371,7 +392,7 @@ public class InputOutputOperations {
 	}
 	public void outputTeamsCsv(IMediator mediator){
 		List<List<String>> rows = new ArrayList<>();
-		List<String> columnNames = Arrays.asList(new String[]{"Team Name","Team ID","Default Channel","Default Meeting Day and Time","Meeting Channel","Meeting Day and Time","Participant ID"});
+		List<String> columnNames = Arrays.asList(new String[]{"Team Name","Team ID","Default Channel","Default Meeting Day and Time","Owners"});
 		rows.add(columnNames);
 		List<Team> teams = mediator.getTeams();
 		for(Team team: teams){
@@ -380,6 +401,15 @@ public class InputOutputOperations {
 			rowData.add(team.getTeamID());
 			rowData.add(team.getDefaultMeetingChannel().getName());
 			rowData.add(team.getDefaultMeetingChannel().getMeetingDate().toString());
+			List<User> owners = team.getTeamOwners();
+
+			String ids = "" + '"';
+			for(User user:owners){
+				ids += user.getUserID() + ";";
+			}
+			ids = ids.substring(0, ids.length() - 1);
+			ids+='"';
+			rowData.add(ids);
 			rows.add(rowData);
 		}
 
