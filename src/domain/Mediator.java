@@ -338,4 +338,14 @@ public class Mediator implements IMediator {
 		}
 		return null;
 	}
+
+	@Override
+	public List<Channel> getAllChannelsExceptDefaultOnes() {
+		List<Channel> channels = new ArrayList<>();
+		for(Team team:teams){
+			channels.addAll(team.getChannels());
+			channels.remove(team.getDefaultMeetingChannel());
+		}
+		return channels;
+	}
 }

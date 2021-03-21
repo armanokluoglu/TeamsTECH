@@ -47,6 +47,6 @@ public interface IMediator {
 	public boolean isUserOwnerOfTeam(User user, Team team);
 	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) throws IllegalArgumentException;
 	public List<Channel> channelsContainingUserInTeam(User user, Team team);
-
+	public List<Channel> getAllChannelsExceptDefaultOnes();
 	public Team findChannelTeam(Channel channel);
 }

@@ -10,4 +10,13 @@ public enum UserType {
     private UserType(String domain) {
         this.domain = domain;
     }
+
+    public static UserType getUserTypeFromString(String type){
+		if(type.equalsIgnoreCase("Student"))
+			return UserType.STUDENT;
+		else if(type.equalsIgnoreCase("Assistant") || type.equalsIgnoreCase("Teaching Assistant"))
+			return UserType.TEACHING_ASSISTANT;
+		else
+			return UserType.INSTRUCTOR;
+	}
 }

@@ -20,7 +20,7 @@ public class TeamsTECH {
         List<User> users = inputOutputOperations.fillUserList("xxx");
         List<Team> teams = inputOutputOperations.fillTeamList("ccc");
 		IMediator med = new Mediator(teams, users, inputOutputOperations);
-		inputOutputOperations.matchUsersAndTeams(users,teams,med);
+		inputOutputOperations.matchUsersAndTeams(med);
 		inputOutputOperations.fillTeamChannels(med,"vvv");
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("=========================================");
