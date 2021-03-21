@@ -133,7 +133,7 @@ public class Mediator implements IMediator {
 	}
 	
 	@Override
-	public Channel removeMeetingChannelFromTeam(Team team, String channelName) {
+	public Channel removeMeetingChannelFromTeam(Team team, String channelName) throws IllegalArgumentException{
 		return team.removeMeetingChannel(channelName);
 	}
 	
@@ -310,8 +310,10 @@ public class Mediator implements IMediator {
 	}
 	
 	@Override
-	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) {
+	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) throws IllegalArgumentException {
 		Channel channel = team.getChannel(channelName);
+		if(channel==null)
+			throw new IllegalArgumentException("Channel does not exist with given channel name");
 		User owner = ((PrivateChannel) channel).getChannelOwner();
 		return user.getUserID() == owner.getUserID();
 	}

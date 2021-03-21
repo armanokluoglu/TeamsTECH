@@ -93,39 +93,16 @@ public class InputOutputOperations {
 				String channelName = values[2];
 				String date = values[3];
 				String[] splitStr = date.split("\\s+");
-				Date meetingDate = stringToDate(splitStr);
+				Date meetingDate = Date.stringToDate(splitStr);
 				Channel channel = new MeetingChannel(channelName,meetingDate);
 
-//				Channel channel1 = null;
-//				if(values.length>4){
-//					String channel2Name = values[4];
-//					Date date1;
-//					if(!values[5].equals("")){
-//						date1 = stringToDate(values[3].split("\\s+"));
-//						((MeetingChannel)channel1).setMeetingDate(date1);
-//					}
-//					channel1 = new MeetingChannel(channel2Name);
-//					if(!values[6].equals((""))){
-//						String[] splitStr2 = values[6].split(";");
-//						List<String> ids = new ArrayList<>();
-//						for(String s: splitStr2){
-//							s = s.replace(String.valueOf('"'), "");
-//							s = s.replace(" ", "");
-//							ids.add(s);
-//						}
-//					}
-//				}
+
 				List<User> owners = new ArrayList<>();
 				List<User> members = new ArrayList<>();
 				List<Channel> channels = new ArrayList<>();
-//				if(channel1!=null)
-//					channels.add(channel1);
+
 				Team team = new Team(name,teamId,owners,channel,channels,members);
 				teams.add(team);
-//				for(String s: values){
-//					System.out.print(s + "| ");
-//				}
-//				System.out.println();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -166,7 +143,7 @@ public class InputOutputOperations {
 						if(meetingDate!=""){
 							String[] meetingDateSplit = meetingDate.split("\\s+");
 							if(meetingDateSplit.length>1){
-								Date date = stringToDate(meetingDateSplit);
+								Date date = Date.stringToDate(meetingDateSplit);
 								((MeetingChannel)channel).setMeetingDate(date);
 							}
 						}
@@ -204,7 +181,6 @@ public class InputOutputOperations {
 						Team team = mediator.getTeam(values[i]);
 						if(user.getUserType().equals(UserType.INSTRUCTOR)){
 							mediator.addMemberToTeam(team.getTeamID(),user);
-							mediator.elevateMemberToTeamOwnerOfTeam(team.getTeamID(),user.getUserID());
 							mediator.addMemberToChannelOfTeam(team.getTeamID(),team.getDefaultMeetingChannel().getChannelID(),user.getUserID());
 						}else{
 							mediator.addMemberToTeam(team.getTeamID(),user);
@@ -247,79 +223,6 @@ public class InputOutputOperations {
 		}
 	}
 
-	private Date stringToDate(String[] s){
-		String day = s[0];
-		String time = s[1];
-		DayOfTheWeek dayOfTheWeek;
-		if(day.equals("Monday"))
-			dayOfTheWeek = DayOfTheWeek.MONDAY;
-		else if(day.equals("Tuesday"))
-			dayOfTheWeek = DayOfTheWeek.TUESDAY;
-		else if(day.equals("Wednesday"))
-			dayOfTheWeek = DayOfTheWeek.WEDNESDAY;
-		else if(day.equals("Thursday"))
-			dayOfTheWeek = DayOfTheWeek.THURSDAY;
-		else if(day.equals("Friday"))
-			dayOfTheWeek = DayOfTheWeek.FRIDAY;
-		else if(day.equals("Saturday"))
-			dayOfTheWeek = DayOfTheWeek.SATURDAY;
-		else
-			dayOfTheWeek = DayOfTheWeek.SUNDAY;
-
-		String[] splitStr = s[1].split(":");
-		int hour = Integer.parseInt(splitStr[0]);
-		int minute = Integer.parseInt(splitStr[1]);
-
-		Date date = new Date(dayOfTheWeek,hour,minute);
-		return date;
-	}
-
-//	private List<ParticipantChannel> getParticipantAndChannelFromTeamList(String path){
-//
-//		List<ParticipantChannel> participantChannels = new ArrayList<>();
-//		try (BufferedReader br = new BufferedReader(new FileReader("teamList.csv"))) {
-//			String line;
-//			br.readLine();
-//			while ((line = br.readLine()) != null) {
-//				String[] values = line.split(",");
-//				Channel channel1 = null;
-//				String teamId = values[1];
-//				if(values.length>4){
-//					String channelName = values[4];
-//					channel1 = new MeetingChannel(channelName);
-//					Date date1;
-//					if(!values[5].equals("")){
-//						date1 = stringToDate(values[3].split("\\s+"));
-//						((MeetingChannel)channel1).setMeetingDate(date1);
-//					}
-//					if(!values[6].equals((""))){
-//						String[] splitStr2 = values[6].split(";");
-//						List<String> ids = new ArrayList<>();
-//						for(String s: splitStr2){
-//							s = s.replace(String.valueOf('"'), "");
-//							s = s.replace(" ", "");
-//							ids.add(s);
-//						}
-//						for(String id: ids){
-//							ParticipantChannel participantChannel = new ParticipantChannel();
-//							participantChannel.setTeamId(teamId);
-//							participantChannel.setChannelName(channelName);
-//							participantChannel.setParticipantId(Integer.parseInt(id));
-//							participantChannels.add(participantChannel);
-//						}
-//					}
-//				}
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		return participantChannels;
-//
-//
-////		for(ParticipantChannel participantChannel:participantChannels){
-////			iMediator.addMemberToChannelOfTeam(participantChannel.teamId,participantChannel.channelId,participantChannel.participantId);
-////		}
-//	}
 
 	private class ParticipantChannel{
 

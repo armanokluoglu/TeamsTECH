@@ -17,7 +17,7 @@ public interface IMediator {
 	public Team addMembersToPrivateChannelOfTeam(String teamID, int channelID, int[] memberIDs);
 	public Team removeMembersFromPrivateChannelOfTeam(String teamID, int channelID, int[] memberIDs);
 	public Channel addMeetingChannelToTeam(Team team, String channelName, Date meetingDate);
-	public Channel removeMeetingChannelFromTeam(Team team, String channelName);
+	public Channel removeMeetingChannelFromTeam(Team team, String channelName)  throws IllegalArgumentException;
 	public Channel addPrivateChannelToTeam(Team team, String channelName);
 	public Channel removePrivateChannelFromTeam(Team team, String channelName);
 	public Team addMemberToChannelOfTeam(String teamID, int channelID, int userID);
@@ -45,7 +45,7 @@ public interface IMediator {
 	public List<Team> getTeamsWithCurrentUser();
 	public boolean teamContainsUser(User user, Team team);
 	public boolean isUserOwnerOfTeam(User user, Team team);
-	public boolean isUserOwnerOfChannel(User user, Team team, String channelName);
+	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) throws IllegalArgumentException;
 	public List<Channel> channelsContainingUserInTeam(User user, Team team);
 
 	public Team findChannelTeam(Channel channel);

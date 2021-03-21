@@ -58,10 +58,14 @@ public class Team {
 	}
 	
 	public User removeMember(int userID) {
-		List<User> members = getMembers();
-		for (User member : members) {
+		for(User owner: getTeamOwners()){
+			if(owner.getUserID() == userID) {
+				getTeamOwners().remove(owner);
+			}
+		}
+		for (User member :  getMembers()) {
 			if(member.getUserID() == userID) {
-				members.remove(member);
+				getMembers().remove(member);
 				return member;
 			}
 		}
@@ -113,9 +117,11 @@ public class Team {
 		channels.add(newChannel);
 	}
 	
-	public Channel removeMeetingChannel(String channelName) {
+	public Channel removeMeetingChannel(String channelName) throws IllegalArgumentException{
 
 		Channel channel = getChannel(channelName);
+		if(channel==null)
+			throw new IllegalArgumentException("Channel does not exist with given channel name");
 		getChannels().remove(channel);
 		return channel;
 	}

@@ -1,5 +1,6 @@
 package domain;
 
+import java.util.List;
 import java.util.Random;
 
 import utilities.UserType;
@@ -12,7 +13,7 @@ public class User {
 	private int userID;
 	private String email;
 	private String password;
-	private String[] teamIDs;
+	private List<String> teamIDs;
 	
 	public User(UserType userType, String name) {
 		setUserType(userType);
@@ -135,12 +136,19 @@ public class User {
 		this.password = password;
 	}
 	
-	public String[] getTeamIDs() {
+	public List<String> getTeamIDs() {
 		return teamIDs;
 	}
 	
-	public void setTeamIDs(String[] teamIDs) {
+	public void setTeamIDs(List<String> teamIDs) {
 		this.teamIDs = teamIDs;
+	}
+
+	public void removeTeamId(String teamId){
+		for(String id: teamIDs){
+			if(id.equals(teamId))
+				teamIDs.remove(id);
+		}
 	}
 	
 }

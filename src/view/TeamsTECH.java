@@ -73,7 +73,8 @@ public class TeamsTECH {
 				printTeams(med, scanner, userType);
 				break;
 			case 2:
-				teamMenu(med, scanner, userType);
+				Team team = openTeam(med, scanner, userType);
+				teamMenu(med, scanner, userType,team);
 				break;
 			case 3:
 				joinTeamMenu(med, scanner, userType);
@@ -100,12 +101,19 @@ public class TeamsTECH {
 	}
 	
 	private void leaveTeamMenu(IMediator med, Scanner scanner, UserType userType) {
+
 		System.out.print("Please enter the ID of the team you want to leave: ");
 		String teamToLeave = scanner.next();
-		Team leftTeam = med.removeMemberFromTeam(teamToLeave, med.getCurrentUser().getUserID());
-		System.out.println("Left team " + leftTeam.getTeamName() + ".");
-		mainMenu(med, scanner, userType);
-	}
+		try {
+			Team leftTeam = med.removeMemberFromTeam(teamToLeave, med.getCurrentUser().getUserID());
+			System.out.println("Left team " + leftTeam.getTeamName() + ".");
+			mainMenu(med, scanner, userType);
+		}catch (Exception e){
+			System.out.println("Invalid teamId");
+			mainMenu(med, scanner, userType);
+		}
+
+}
 	
 	private void joinTeamMenu(IMediator med, Scanner scanner, UserType userType) {
 		System.out.print("Please enter the ID of the team you want to join: ");
@@ -154,15 +162,16 @@ public class TeamsTECH {
 		}
 		System.out.print("Please enter a team ID: ");
 		String teamID = scanner.next();
+		scanner.nextLine();
 		System.out.print("Please enter a team name: ");
-		String teamName = scanner.next();
+		String teamName = scanner.nextLine();
 		try {
 			Team createdTeam = med.createTeam(teamName, teamID);
 			System.out.println("Created team " + createdTeam.getTeamName() + " with the ID " + createdTeam.getTeamID() + ".");
 		} catch (UnauthorizedUserOperationException e) {
 			System.out.println("You don't have permission to do that. Please choose a different option.");
 		}catch (IllegalArgumentException e){
-			System.out.println("Team ID cannot be longer than 8 characters.");
+			System.out.println(e.getMessage());
 			mainMenu(med,scanner,userType);
 		}
 		mainMenu(med, scanner, userType);
@@ -174,7 +183,7 @@ public class TeamsTECH {
 		for (Channel channel : channels) {
 			System.out.println(channel.getChannelID() + ": " + channel.getName());
 		}
-		teamMenu(med, scanner, userType);
+		teamMenu(med, scanner, userType,team);
 	}
 	
 	private void printMembers(IMediator med, Scanner scanner, UserType userType, Team team) {
@@ -183,7 +192,7 @@ public class TeamsTECH {
 		for (User user : members) {
 			System.out.println(user.getUserID() + ": " + user.getName());
 		}
-		teamMenu(med, scanner, userType);
+		teamMenu(med, scanner, userType,team);
 	}
 	
 	private void createChannelMenu(IMediator med, Scanner scanner, UserType userType, Team team, String type) {
@@ -196,24 +205,30 @@ public class TeamsTECH {
 		} else if(type == "meeting") {
 			if(med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
 				System.out.print("Please enter the name of the meeting channel you want to create: ");
-				String meetingChannelName = scanner.next();
+				scanner.nextLine();
+				String meetingChannelName = scanner.nextLine();
 				System.out.print("Please enter the meeting date (e.g. Monday 13:30): ");
-				String meetingDateString = scanner.next() +" ";
-				meetingDateString += scanner.next();
-				Date meetingDate = new Date(meetingDateString);
-				Channel createdMeetingChannel = med.addMeetingChannelToTeam(team, meetingChannelName, meetingDate);
-				createdMeetingChannel.addMembers(Arrays.asList(med.getCurrentUser()));
-				System.out.println("Channel " + createdMeetingChannel.getName() + " created in team " + team.getTeamName() + ".");
+				String meetingDateString = scanner.nextLine();
+				try {
+					Date meetingDate = new Date(meetingDateString);
+					Channel createdMeetingChannel = med.addMeetingChannelToTeam(team, meetingChannelName, meetingDate);
+					createdMeetingChannel.addMembers(Arrays.asList(med.getCurrentUser()));
+					System.out.println("Channel " + createdMeetingChannel.getName() + " created in team " + team.getTeamName() + ".");
+				}catch (Exception e){
+					System.out.println("Wrong input");
+					teamMenu(med, scanner, userType,team);
+				}
+
 			} else {
 				System.out.print("You don't have permission to create a meeting channel");
 			}
 		}
-		teamMenu(med, scanner, userType);
+		teamMenu(med, scanner, userType,team);
 	}
 	
 	private void deleteChannelMenu(IMediator med, Scanner scanner, UserType userType, Team team, String type) {
 		if(type == "private") {
-			System.out.print("Please enter the ID of the private channel you want to delete: ");
+			System.out.print("Please enter the name of the private channel you want to delete: ");
 			String channelName = scanner.next();
 			if(med.isUserOwnerOfChannel(med.getCurrentUser(), team, channelName)) {
 				Channel removedPrivateChannel = med.removePrivateChannelFromTeam(team, channelName);
@@ -223,15 +238,22 @@ public class TeamsTECH {
 			}
 		} else if(type == "meeting") {
 			if(med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
-				System.out.print("Please enter the ID of the meeting channel you want to delete: ");
-				String  channelName = scanner.next();
-				Channel removedMeetingChannel = med.removeMeetingChannelFromTeam(team, channelName);
-				System.out.println("Channel " + removedMeetingChannel.getName() + " removed from team " + team.getTeamName() + ".");
+				System.out.print("Please enter the name of the meeting channel you want to delete: ");
+				scanner.nextLine();
+				String  channelName = scanner.nextLine();
+				try {
+					Channel removedMeetingChannel = med.removeMeetingChannelFromTeam(team, channelName);
+					System.out.println("Channel " + removedMeetingChannel.getName() + " removed from team " + team.getTeamName() + ".");
+				}catch (Exception e){
+					System.out.println(e.getMessage());
+					teamMenu(med, scanner, userType,team);
+				}
+
 			} else {
 				System.out.print("You don't have permission to delete a meeting channel");
 			}
 		}
-		teamMenu(med, scanner, userType);
+		teamMenu(med, scanner, userType,team);
 	}
 	
 	private void elevateUserMenu(IMediator med, Scanner scanner, UserType userType, Team team) {
@@ -241,26 +263,30 @@ public class TeamsTECH {
 		if(user!=null){
 			if(med.isUserOwnerOfTeam(med.getCurrentUser(), team) && user.getUserType().equals(UserType.TEACHING_ASSISTANT)) {
 				med.elevateMemberToTeamOwnerOfTeam(team.getTeamID(), id);
+				System.out.println(user.getName() + " elevated to team owner status.");
 			} else {
 				System.out.println("You don't have permission to do that.");
 			}
 		}
-		teamMenu(med, scanner, userType);
+		teamMenu(med, scanner, userType,team);
 	}
-	
-	private void teamMenu(IMediator med, Scanner scanner, UserType userType) {
+	private Team openTeam(IMediator med, Scanner scanner, UserType userType){
 		System.out.print("Please enter the ID of the team you want to open: ");
 		String teamID = scanner.next();
 		Team team = med.getTeam(teamID);
 		if(team == null) {
 			System.out.println("Incorrect ID.");
-			teamMenu(med, scanner, userType);
+			mainMenu(med,scanner,userType);
 		}
 		if(!med.teamContainsUser(med.getCurrentUser(), team)) {
 			System.out.println("You are not a member of this team.");
-			teamMenu(med, scanner, userType);
+			mainMenu(med,scanner,userType);
 		}
 		System.out.println("\nWelcome to team " + team.getTeamName() + ".\n");
+		return team;
+	}
+	private void teamMenu(IMediator med, Scanner scanner, UserType userType,Team team) {
+
 		
 		System.out.println("What would you like to do?");
 		System.out.println("1. Print all channels you're a member of.");
