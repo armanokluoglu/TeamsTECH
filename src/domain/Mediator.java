@@ -356,12 +356,4 @@ public class Mediator implements IMediator {
 		return channels;
 	}
 
-	@Override
-	public boolean isUserIdValid(int id) {
-		for(User user: users){
-			if(user.getUserID() ==id)
-				return false;
-		}
-		return true;
-	}
 }

@@ -86,5 +86,4 @@ public interface IMediator {
 
 	public Team findChannelTeam(Channel channel);
 
-	public boolean isUserIdValid(int id);
 }
