@@ -59,7 +59,8 @@ public class Mediator implements IMediator {
 		List<User> allInstructors = new ArrayList<User>();
 		for (Team team : getTeams()) {
 			List<User> allInstructorsInTeam = getAllInstructorsInTeam(team.getTeamID());
-			allInstructors = Stream.concat(allInstructors.stream(), allInstructorsInTeam.stream()).collect(Collectors.toList());
+			allInstructors = Stream.concat(allInstructors.stream(), allInstructorsInTeam.stream())
+					.collect(Collectors.toList());
 		}
 		return allInstructors;
 	}
@@ -68,7 +69,8 @@ public class Mediator implements IMediator {
 		List<User> allAssistants = new ArrayList<User>();
 		for (Team team : getTeams()) {
 			List<User> allAssistantsInTeam = getAllAssistantsInTeam(team.getTeamID());
-			allAssistants = Stream.concat(allAssistants.stream(), allAssistantsInTeam.stream()).collect(Collectors.toList());
+			allAssistants = Stream.concat(allAssistants.stream(), allAssistantsInTeam.stream())
+					.collect(Collectors.toList());
 		}
 		return allAssistants;
 	}
@@ -76,7 +78,7 @@ public class Mediator implements IMediator {
 	@Override
 	public Team getTeam(String teamID) {
 		for (Team team : getTeams()) {
-			if(team.getTeamID().equals(teamID)) {
+			if (team.getTeamID().equals(teamID)) {
 				return team;
 			}
 		}
@@ -88,11 +90,11 @@ public class Mediator implements IMediator {
 		List<Team> teams = getTeams();
 		teams.add(team);
 	}
-	
+
 	@Override
 	public Team createTeam(String teamName, String teamID) throws UnauthorizedUserOperationException {
 		User currentUser = getCurrentUser();
-		if(currentUser.getUserType() != UserType.INSTRUCTOR) {
+		if (currentUser.getUserType() != UserType.INSTRUCTOR) {
 			throw new UnauthorizedUserOperationException("Unauthorized.");
 		}
 		Team team = new Team(teamName, teamID, currentUser);
@@ -104,7 +106,7 @@ public class Mediator implements IMediator {
 	public Team removeTeam(String teamID) throws UnauthorizedUserOperationException {
 		Team teamToRemove = getTeam(teamID);
 		List<Team> teams = getTeams();
-		if(!teamToRemove.isUserOwner(getCurrentUser())) {
+		if (!teamToRemove.isUserOwner(getCurrentUser())) {
 			throw new UnauthorizedUserOperationException("Unauthorized.");
 		}
 		teams.remove(teamToRemove);
@@ -112,38 +114,42 @@ public class Mediator implements IMediator {
 	}
 
 	@Override
-	public Team addMembersToPrivateChannelOfTeam(String teamID, int channelID, int[] memberIDs) {
-		Team team = getTeam(teamID);
+	public Team addMembersToPrivateChannelOfTeam(Team team, int channelID, int[] memberIDs) {
 		team.addMembersToPrivateChannel(channelID, memberIDs);
 		return team;
 	}
-	
+
 	@Override
-	public Team removeMembersFromPrivateChannelOfTeam(String teamID, int channelID, int[] memberIDs) {
-		Team team = getTeam(teamID);
+	public Team removeMembersFromPrivateChannelOfTeam(Team team, int channelID, int[] memberIDs) {
 		team.removeMembersFromPrivateChannel(channelID, memberIDs);
 		return team;
 	}
-	
+
+	@Override
+	public Channel changeMeetingDateOfChannel(Channel channel, Date newMeetingDate) {
+		((MeetingChannel) channel).setMeetingDate(newMeetingDate);
+		return channel;
+	}
+
 	@Override
 	public Channel addMeetingChannelToTeam(Team team, String channelName, Date meetingDate) {
 		Channel channel = new MeetingChannel(channelName, meetingDate);
 		team.addMeetingChannel(channel);
 		return channel;
 	}
-	
+
 	@Override
-	public Channel removeMeetingChannelFromTeam(Team team, String channelName) throws IllegalArgumentException{
+	public Channel removeMeetingChannelFromTeam(Team team, String channelName) throws IllegalArgumentException {
 		return team.removeMeetingChannel(channelName);
 	}
-	
+
 	@Override
 	public Channel addPrivateChannelToTeam(Team team, String channelName) {
 		Channel channel = new PrivateChannel(channelName, getCurrentUser());
 		team.addPrivateChannel(channel);
 		return channel;
 	}
-	
+
 	@Override
 	public Channel removePrivateChannelFromTeam(Team team, String channelName) {
 		return team.removePrivateChannel(channelName);
@@ -197,12 +203,12 @@ public class Mediator implements IMediator {
 	public List<User> getAllAssistantsInTeam(String teamID) {
 		return getAllUsersOfTypeInTeam(UserType.TEACHING_ASSISTANT, teamID);
 	}
-	
+
 	private List<User> getAllUsersOfTypeInTeam(UserType type, String teamID) {
 		Team team = getTeam(teamID);
 		List<User> allUsersOfType = new ArrayList<User>();
 		for (User user : team.getMembers()) {
-			if(user.getUserType() == type) {
+			if (user.getUserType() == type) {
 				allUsersOfType.add(user);
 			}
 		}
@@ -216,8 +222,8 @@ public class Mediator implements IMediator {
 
 	@Override
 	public Team findTeamById(String id) {
-		for(Team team: teams){
-			if(team.getTeamID().equals(id))
+		for (Team team : teams) {
+			if (team.getTeamID().equals(id))
 				return team;
 		}
 		return null;
@@ -225,8 +231,8 @@ public class Mediator implements IMediator {
 
 	@Override
 	public User findUserById(int id) {
-		for(User user: users){
-			if(user.getUserID() == id)
+		for (User user : users) {
+			if (user.getUserID() == id)
 				return user;
 		}
 		return null;
@@ -235,32 +241,33 @@ public class Mediator implements IMediator {
 	@Override
 	public Channel findChannelByTeamIdAndChannelName(String teamId, String channelName) {
 		Team team = findTeamById(teamId);
-		if(team!=null)
+		if (team != null)
 			return team.getChannel(channelName);
 		return null;
 	}
 
 	@Override
-	public List<Team> getAllTeamsForUser(int userId){
+	public List<Team> getAllTeamsForUser(int userId) {
 		User user = findUserById(userId);
 		List<Team> userTeams = new ArrayList<>();
-		if(user!=null){
-			for(Team team:teams){
-				if(team.containsUser(user))
+		if (user != null) {
+			for (Team team : teams) {
+				if (team.containsUser(user))
 					userTeams.add(team);
 			}
 		}
 		return userTeams;
 	}
-	
+
 	@Override
-	public User getUserFromEmailAndPassword(String email, String password) throws PasswordIncorrectException, NotFoundException {
+	public User getUserFromEmailAndPassword(String email, String password)
+			throws PasswordIncorrectException, NotFoundException {
 		List<User> users = getUsers();
 		for (User user : users) {
-			if(user.getEmail().equals(email)) {
-				if(user.getPassword().equals(password)) {
+			if (user.getEmail().equals(email)) {
+				if (user.getPassword().equals(password)) {
 					return user;
-				}else
+				} else
 					throw new PasswordIncorrectException();
 			}
 		}
@@ -271,59 +278,59 @@ public class Mediator implements IMediator {
 	public InputOutputOperations getIO() {
 		return io;
 	}
-	
+
 	@Override
 	public void setIO(InputOutputOperations io) {
 		this.io = io;
 	}
-	
+
 	@Override
 	public User getCurrentUser() {
 		return currentUser;
 	}
-	
+
 	@Override
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
 	}
-	
+
 	@Override
 	public List<Team> getTeamsWithCurrentUser() {
 		List<Team> teamsWithCurrentUser = new ArrayList<Team>();
 		List<Team> teams = getTeams();
 		for (Team team : teams) {
-			if(team.containsUser(getCurrentUser())) {
+			if (team.containsUser(getCurrentUser())) {
 				teamsWithCurrentUser.add(team);
 			}
 		}
 		return teamsWithCurrentUser;
 	}
-	
+
 	@Override
 	public boolean teamContainsUser(User user, Team team) {
 		return team.containsUser(user);
 	}
-	
+
 	@Override
 	public boolean isUserOwnerOfTeam(User user, Team team) {
 		return team.isUserOwner(user);
 	}
-	
+
 	@Override
 	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) throws IllegalArgumentException {
 		Channel channel = team.getChannel(channelName);
-		if(channel==null)
+		if (channel == null)
 			throw new IllegalArgumentException("Channel does not exist with given channel name");
 		User owner = ((PrivateChannel) channel).getChannelOwner();
 		return user.getUserID() == owner.getUserID();
 	}
-	
+
 	@Override
 	public List<Channel> channelsContainingUserInTeam(User user, Team team) {
 		List<Channel> channels = team.getChannels();
 		List<Channel> channelsToReturn = new ArrayList<Channel>();
 		for (Channel channel : channels) {
-			if(channel.getMembers().contains(user)) {
+			if (channel.getMembers().contains(user)) {
 				channelsToReturn.add(channel);
 			}
 		}
@@ -332,10 +339,20 @@ public class Mediator implements IMediator {
 
 	@Override
 	public Team findChannelTeam(Channel channel) {
-		for(Team team: teams){
-			if(team.getChannels().contains(channel))
+		for (Team team : teams) {
+			if (team.getChannels().contains(channel))
 				return team;
 		}
 		return null;
+	}
+
+	@Override
+	public List<Channel> getAllChannelsExceptDefaultOnes() {
+		List<Channel> channels = new ArrayList<>();
+		for (Team team : teams) {
+			channels.addAll(team.getChannels());
+			channels.remove(team.getDefaultMeetingChannel());
+		}
+		return channels;
 	}
 }
