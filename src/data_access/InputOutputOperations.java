@@ -31,9 +31,9 @@ public class InputOutputOperations {
 				User user;
 				if (values.length < 3 || values[2].equals(""))
 					user = new User(type, name);
-				else{
+				else {
 					user = new User(type, name, Integer.parseInt(values[2]));
-					solveConflictForUserWithSpecificId(users,user);
+					solveConflictForUserWithSpecificId(users, user);
 				}
 
 				if (values.length > 4 && !values[4].equals(""))
@@ -317,34 +317,38 @@ public class InputOutputOperations {
 		return ids;
 	}
 
-	private int generateUserID(List<User> users){
+	private int generateUserID(List<User> users) {
 		Random random = new Random();
 		int id = random.nextInt(999) + 1;
-		while (id<1000){
-			if(isUserIdValid(users,id))
+		while (id < 1000) {
+			if (isUserIdValid(users, id))
 				return id;
-			id +=1;
+			id += 1;
 		}
 		return generateUserID(users);
 	}
-	private User solveConflictForUserWithSpecificId(List<User> users,User user){
-		if(isUserIdValid(users,user.getUserID()))
+
+	private User solveConflictForUserWithSpecificId(List<User> users, User user) {
+		if (isUserIdValid(users, user.getUserID()))
 			return user;
 		User userWithSameId = findUserById(users, user.getUserID());
 		int newId = generateUserID(users);
 		userWithSameId.setUserID(newId);
 		return user;
 	}
-	public boolean isUserIdValid(List<User> users,int id) {
-		for(User user: users){
-			if(user.getUserID() ==id)
+
+	public boolean isUserIdValid(List<User> users, int id) {
+		for (User user : users) {
+			if (user.getUserID() == id)
 				return false;
 		}
 		return true;
+
 	}
-	private User findUserById(List<User> users,int id){
-		for(User user: users){
-			if(user.getUserID() ==id)
+
+	private User findUserById(List<User> users, int id) {
+		for (User user : users) {
+			if (user.getUserID() == id)
 				return user;
 		}
 		return null;

@@ -11,8 +11,6 @@ import utilities.UnauthorizedUserOperationException;
 public interface IMediator {
 	public Team getTeam(String teamID);
 
-	public void addTeam(Team team);
-
 	public Team createTeam(String teamName, String teamID) throws UnauthorizedUserOperationException;
 
 	public Team removeTeam(String teamID) throws UnauthorizedUserOperationException;
@@ -52,8 +50,6 @@ public interface IMediator {
 	public Team findTeamById(String id);
 
 	public User findUserById(int id);
-
-	public Channel findChannelByTeamIdAndChannelName(String teamId, String channelName);
 
 	public List<Team> getAllTeamsForUser(int userId);
 

@@ -87,8 +87,7 @@ public class Mediator implements IMediator {
 		return null;
 	}
 
-	@Override
-	public void addTeam(Team team) {
+	private void addTeam(Team team) {
 		List<Team> teams = getTeams();
 		teams.add(team);
 	}
@@ -237,14 +236,6 @@ public class Mediator implements IMediator {
 			if (user.getUserID() == id)
 				return user;
 		}
-		return null;
-	}
-
-	@Override
-	public Channel findChannelByTeamIdAndChannelName(String teamId, String channelName) {
-		Team team = findTeamById(teamId);
-		if (team != null)
-			return team.getChannel(channelName);
 		return null;
 	}
 
