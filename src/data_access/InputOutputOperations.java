@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class InputOutputOperations {
 
@@ -311,5 +312,38 @@ public class InputOutputOperations {
 			}
 		}
 		return ids;
+	}
+
+	private int generateUserID(List<User> users){
+		Random random = new Random();
+		int id = random.nextInt(999) + 1;
+		while (id<1000){
+			if(isUserIdValid(users,id))
+				return id;
+			id +=1;
+		}
+		return generateUserID(users);
+	}
+	private User createUserWithSpecificId(List<User> users,User user){
+		if(isUserIdValid(users,user.getUserID()))
+			return user;
+		User userWithSameId = findUserById(users, user.getUserID());
+		int newId = generateUserID(users);
+		userWithSameId.setUserID(newId);
+		return user;
+	}
+	public boolean isUserIdValid(List<User> users,int id) {
+		for(User user: users){
+			if(user.getUserID() ==id)
+				return false;
+		}
+		return true;
+	}
+	private User findUserById(List<User> users,int id){
+		for(User user: users){
+			if(user.getUserID() ==id)
+				return user;
+		}
+		return null;
 	}
 }

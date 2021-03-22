@@ -85,4 +85,6 @@ public interface IMediator {
 	public List<Channel> getAllChannelsExceptDefaultOnes();
 
 	public Team findChannelTeam(Channel channel);
+
+	public boolean isUserIdValid(int id);
 }
