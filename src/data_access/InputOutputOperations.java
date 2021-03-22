@@ -31,8 +31,11 @@ public class InputOutputOperations {
 				User user;
 				if (values.length < 3 || values[2].equals(""))
 					user = new User(type, name);
-				else
+				else{
 					user = new User(type, name, Integer.parseInt(values[2]));
+					solveConflictForUserWithSpecificId(users,user);
+				}
+
 				if (values.length > 4 && !values[4].equals(""))
 					user.setPassword(values[4]);
 				users.add(user);
@@ -324,7 +327,7 @@ public class InputOutputOperations {
 		}
 		return generateUserID(users);
 	}
-	private User createUserWithSpecificId(List<User> users,User user){
+	private User solveConflictForUserWithSpecificId(List<User> users,User user){
 		if(isUserIdValid(users,user.getUserID()))
 			return user;
 		User userWithSameId = findUserById(users, user.getUserID());
