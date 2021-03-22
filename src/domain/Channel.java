@@ -43,9 +43,11 @@ public abstract class Channel {
 	}
 
 	public void addMember(User member) {
-		List<User> newList = getMembers();
-		newList.add(member);
-		setMembers(newList);
+		if(!members.contains(member)){
+			List<User> newList = getMembers();
+			newList.add(member);
+			setMembers(newList);
+		}
 	}
 
 	public void removeMember(User member) {

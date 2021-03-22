@@ -115,12 +115,14 @@ public class Team {
 	}
 
 	public void addMeetingChannel(Channel newChannel) {
+		for(User member:members)
+			newChannel.addMember(member);
 		newChannel.setMembers(getMembers());
 		channels.add(newChannel);
 	}
 
-	public Channel removeMeetingChannel(String channelName) throws IllegalArgumentException {
-		Channel channel = getChannel(channelName);
+	public Channel removeMeetingChannel(int channelId) throws IllegalArgumentException {
+		Channel channel = getChannel(channelId);
 		if (channel == null)
 			throw new IllegalArgumentException("Channel does not exist with given channel name");
 		getChannels().remove(channel);
@@ -131,8 +133,8 @@ public class Team {
 		channels.add(newChannel);
 	}
 
-	public Channel removePrivateChannel(String channelName) {
-		Channel channel = getChannel(channelName);
+	public Channel removePrivateChannel(int channelId) {
+		Channel channel = getChannel(channelId);
 		getChannels().remove(channel);
 		return channel;
 	}

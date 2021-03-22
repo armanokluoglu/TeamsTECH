@@ -1,7 +1,10 @@
 package view;
 
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.StreamSupport;
+
 import data_access.InputOutputOperations;
 import domain.Channel;
 import domain.IMediator;
@@ -62,7 +65,15 @@ public class TeamsTECH {
 		}
 		System.out.println("9. Log out.");
 		System.out.print("Please enter a number: ");
-		int choice = scanner.nextInt();
+		int choice = -1;
+		try {
+			choice = scanner.nextInt();
+
+		}catch (InputMismatchException e){
+			scanner.nextLine();
+			System.out.println("Please choose a valid option.\n");
+			mainMenu(med, scanner);
+		}
 		System.out.println();
 		switch (choice) {
 		case 1:
@@ -245,52 +256,66 @@ public class TeamsTECH {
 
 	private void deleteChannelMenu(IMediator med, Scanner scanner, String type) {
 		Team team = med.getCurrentTeam();
-		if (type == "private") {
-			System.out.print("Please enter the name of the private channel you want to delete: ");
-			String channelName = scanner.next();
-			if (med.isUserOwnerOfChannel(med.getCurrentUser(), team, channelName)) {
-				Channel removedPrivateChannel = med.removePrivateChannelFromTeam(team, channelName);
-				System.out.println("Channel " + removedPrivateChannel.getName() + " removed from team "
-						+ team.getTeamName() + ".\n");
-			} else {
-				System.out.println("You are not the owner of this channel.\n");
-			}
-		} else if (type == "meeting") {
-			if (med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
-				System.out.print("Please enter the name of the meeting channel you want to delete: ");
-				scanner.nextLine();
-				String channelName = scanner.nextLine();
-				try {
-					Channel removedMeetingChannel = med.removeMeetingChannelFromTeam(team, channelName);
-					System.out.println("Channel " + removedMeetingChannel.getName() + " removed from team "
-							+ team.getTeamName() + ".\n");
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
-					teamMenu(med, scanner);
-				}
+		try {
+			if (type == "private") {
+				System.out.print("Please enter the name of the private channel you want to delete: ");
 
-			} else {
-				System.out.print("You don't have permission to delete a meeting channel.\n");
+				int channelId = scanner.nextInt();
+				if (med.isUserOwnerOfChannel(med.getCurrentUser(), team, channelId)) {
+					Channel removedPrivateChannel = med.removePrivateChannelFromTeam(team, channelId);
+					System.out.println("Channel " + removedPrivateChannel.getName() + " removed from team "
+							+ team.getTeamName() + ".\n");
+				} else {
+					System.out.println("You are not the owner of this channel.\n");
+				}
+			} else if (type == "meeting") {
+				if (med.isUserOwnerOfTeam(med.getCurrentUser(), team)) {
+					System.out.print("Please enter the name of the meeting channel you want to delete: ");
+					int channelId = scanner.nextInt();
+					try {
+						Channel removedMeetingChannel = med.removeMeetingChannelFromTeam(team, channelId);
+						System.out.println("Channel " + removedMeetingChannel.getName() + " removed from team "
+								+ team.getTeamName() + ".\n");
+					} catch (Exception e) {
+						System.out.println(e.getMessage());
+						teamMenu(med, scanner);
+					}
+
+				} else {
+					System.out.print("You don't have permission to delete a meeting channel.\n");
+				}
 			}
+			teamMenu(med, scanner);
+		}catch (Exception e){
+			scanner.nextLine();
+			System.out.println("Wrong input");
+			teamMenu(med, scanner);
+
 		}
-		teamMenu(med, scanner);
+
 	}
 
 	private void elevateUserMenu(IMediator med, Scanner scanner) {
 		Team team = med.getCurrentTeam();
-		System.out.print("Enter the ID of the user you want to make team owner: ");
-		int id = scanner.nextInt();
-		User user = med.findUserById(id);
-		if (user != null) {
-			if (med.isUserOwnerOfTeam(med.getCurrentUser(), team)
-					&& user.getUserType().equals(UserType.TEACHING_ASSISTANT)) {
-				med.elevateMemberToTeamOwnerOfTeam(team.getTeamID(), id);
-				System.out.println(user.getName() + " elevated to team owner status.\n");
-			} else {
-				System.out.println("You don't have permission to do that.\n");
+		try {
+			System.out.print("Enter the ID of the user you want to make team owner: ");
+			int id = scanner.nextInt();
+			User user = med.findUserById(id);
+			if (user != null) {
+				if (med.isUserOwnerOfTeam(med.getCurrentUser(), team)
+						&& user.getUserType().equals(UserType.TEACHING_ASSISTANT)) {
+					med.elevateMemberToTeamOwnerOfTeam(team.getTeamID(), id);
+					System.out.println(user.getName() + " elevated to team owner status.\n");
+				} else {
+					System.out.println("You don't have permission to do that.\n");
+				}
 			}
+			teamMenu(med, scanner);
+		}catch (InputMismatchException e){
+			scanner.nextLine();
+			System.out.println("Wrong Input.\n");
+			teamMenu(med, scanner);
 		}
-		teamMenu(med, scanner);
 	}
 
 	private void openTeam(IMediator med, Scanner scanner) {
@@ -326,7 +351,14 @@ public class TeamsTECH {
 		System.out.println("8. Go back to the main menu.");
 		System.out.println("9. Log out.");
 		System.out.print("Please enter a number: ");
-		int choice = scanner.nextInt();
+		int choice = -1;
+		try {
+			choice = scanner.nextInt();
+		}catch (InputMismatchException e){
+			scanner.nextLine();
+			System.out.println("Please choose a valid option.\n");
+			mainMenu(med, scanner);
+		}
 		System.out.println();
 		switch (choice) {
 		case 0:
@@ -390,39 +422,55 @@ public class TeamsTECH {
 	private void addMemberToChannelMenu(IMediator med, Scanner scanner) {
 		Team team = med.getCurrentTeam();
 		Channel channel = med.getCurrentChannel();
-		System.out.print("Enter the ID of the user you want to make channel member: ");
-		int id = scanner.nextInt();
-		User user = med.findUserById(id);
-		if (!med.teamContainsUser(user, team)) {
-			System.out.println("User is not a member of team " + team.getTeamName() + ".\n");
+		try {
+			System.out.print("Enter the ID of the user you want to make channel member: ");
+			int id = scanner.nextInt();
+			User user = med.findUserById(id);
+			if (!med.teamContainsUser(user, team)) {
+				System.out.println("User is not a member of team " + team.getTeamName() + ".\n");
+				channelMenu(med, scanner);
+			}
+			if (med.channelContainsUser(user, channel)) {
+				System.out.println("User is already a member of channel " + channel.getName() + ".\n");
+				channelMenu(med, scanner);
+			}
+			med.addMemberToPrivateChannelOfTeam(team, channel.getChannelID(), id);
+			System.out.println("User " + user.getName() + " added to channel " + channel.getName() + ".\n");
 			channelMenu(med, scanner);
-		}
-		if (med.channelContainsUser(user, channel)) {
-			System.out.println("User is already a member of channel " + channel.getName() + ".\n");
+		}catch (InputMismatchException e){
+			scanner.nextLine();
+			System.out.println("Wrong input\n");
+
 			channelMenu(med, scanner);
+
 		}
-		med.addMemberToPrivateChannelOfTeam(team, channel.getChannelID(), id);
-		System.out.println("User " + user.getName() + " added to channel " + channel.getName() + ".\n");
-		channelMenu(med, scanner);
+
 	}
 
 	private void removeMemberFromChannelMenu(IMediator med, Scanner scanner) {
 		Team team = med.getCurrentTeam();
 		Channel channel = med.getCurrentChannel();
-		System.out.print("Enter the ID of the user you want to remove from channel: ");
-		int id = scanner.nextInt();
-		User user = med.findUserById(id);
-		if (!med.teamContainsUser(user, team)) {
-			System.out.println("User is not a member of team " + team.getTeamName() + ".\n");
+		try {
+			System.out.print("Enter the ID of the user you want to remove from channel: ");
+			int id = scanner.nextInt();
+			User user = med.findUserById(id);
+			if (!med.teamContainsUser(user, team)) {
+				System.out.println("User is not a member of team " + team.getTeamName() + ".\n");
+				channelMenu(med, scanner);
+			}
+			if (!med.channelContainsUser(user, channel)) {
+				System.out.println("User is not a member of channel " + channel.getName() + ".\n");
+				channelMenu(med, scanner);
+			}
+			med.removeMemberFromPrivateChannelOfTeam(team, channel.getChannelID(), id);
+			System.out.println("User " + user.getName() + " removed from channel " + channel.getName() + ".\n");
+			channelMenu(med, scanner);
+		}catch (InputMismatchException e){
+			scanner.nextLine();
+			System.out.println("Wrong Input\n");
 			channelMenu(med, scanner);
 		}
-		if (!med.channelContainsUser(user, channel)) {
-			System.out.println("User is not a member of channel " + channel.getName() + ".\n");
-			channelMenu(med, scanner);
-		}
-		med.removeMemberFromPrivateChannelOfTeam(team, channel.getChannelID(), id);
-		System.out.println("User " + user.getName() + " removed from channel " + channel.getName() + ".\n");
-		channelMenu(med, scanner);
+
 	}
 
 	private void changeMeetingDateMenu(IMediator med, Scanner scanner) {
@@ -467,7 +515,15 @@ public class TeamsTECH {
 		System.out.println("8. Go back to the main menu.");
 		System.out.println("9. Log out.");
 		System.out.print("Please enter a number: ");
-		int choice = scanner.nextInt();
+		int choice = -1;
+		try {
+			choice = scanner.nextInt();
+
+		}catch (InputMismatchException e){
+			scanner.nextLine();
+			System.out.println("Wrong Input.\n");
+			teamMenu(med, scanner);
+		}
 		System.out.println();
 		switch (choice) {
 		case 1:

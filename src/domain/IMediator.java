@@ -23,11 +23,11 @@ public interface IMediator {
 
 	public Channel addMeetingChannelToTeam(Team team, String channelName, Date meetingDate);
 
-	public Channel removeMeetingChannelFromTeam(Team team, String channelName) throws IllegalArgumentException;
+	public Channel removeMeetingChannelFromTeam(Team team, int channelId) throws IllegalArgumentException;
 
 	public Channel addPrivateChannelToTeam(Team team, String channelName);
 
-	public Channel removePrivateChannelFromTeam(Team team, String channelName);
+	public Channel removePrivateChannelFromTeam(Team team, int channelId);
 
 	public Team addMemberToChannelOfTeam(String teamID, int channelID, int userID);
 
@@ -84,7 +84,7 @@ public interface IMediator {
 		
 	public boolean isUserOwnerOfTeam(User user, Team team);
 
-	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) throws IllegalArgumentException;
+	public boolean isUserOwnerOfChannel(User user, Team team, int channelId) throws IllegalArgumentException;
 
 	public List<Channel> channelsContainingUserInTeam(User user, Team team);
 
