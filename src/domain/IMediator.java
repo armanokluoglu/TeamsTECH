@@ -17,9 +17,9 @@ public interface IMediator {
 
 	public Team removeTeam(String teamID) throws UnauthorizedUserOperationException;
 
-	public Team addMembersToPrivateChannelOfTeam(Team team, int channelID, int[] memberIDs);
+	public Team addMemberToPrivateChannelOfTeam(Team team, int channelID, int memberID);
 
-	public Team removeMembersFromPrivateChannelOfTeam(Team team, int channelID, int[] memberIDs);
+	public Team removeMemberFromPrivateChannelOfTeam(Team team, int channelID, int memberID);
 
 	public Channel changeMeetingDateOfChannel(Channel channel, Date newMeetingDate);
 
@@ -65,6 +65,14 @@ public interface IMediator {
 
 	public void setCurrentUser(User currentUser);
 
+	public Team getCurrentTeam();
+
+	public void setCurrentTeam(Team currentTeam);
+
+	public Channel getCurrentChannel();
+
+	public void setCurrentChannel(Channel currentChannel);
+
 	public InputOutputOperations getIO();
 
 	public void setIO(InputOutputOperations io);
@@ -75,7 +83,9 @@ public interface IMediator {
 	public List<Team> getTeamsWithCurrentUser();
 
 	public boolean teamContainsUser(User user, Team team);
-
+	
+	public boolean channelContainsUser(User user, Channel channel);
+		
 	public boolean isUserOwnerOfTeam(User user, Team team);
 
 	public boolean isUserOwnerOfChannel(User user, Team team, String channelName) throws IllegalArgumentException;
@@ -85,5 +95,4 @@ public interface IMediator {
 	public List<Channel> getAllChannelsExceptDefaultOnes();
 
 	public Team findChannelTeam(Channel channel);
-
 }

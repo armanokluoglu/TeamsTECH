@@ -93,21 +93,21 @@ public class Team {
 		return member;
 	}
 
-	public void addMembersToPrivateChannel(int channelID, int[] memberIDs) {
+	public void addMemberToPrivateChannel(int channelID, int memberID) {
 		Channel channel = getChannel(channelID);
 		if (channel.getClass().isAssignableFrom(PrivateChannel.class)) {
-			List<User> members = getMembersWithIDs(memberIDs);
-			channel.addMembers(members);
+			User member = getMember(memberID);
+			channel.addMember(member);
 		} else {
 			// exception
 		}
 	}
 
-	public Channel removeMembersFromPrivateChannel(int channelID, int[] memberIDs) {
+	public Channel removeMemberFromPrivateChannel(int channelID, int memberID) {
 		Channel channel = getChannel(channelID);
 		if (channel.getClass().isAssignableFrom(PrivateChannel.class)) {
-			List<User> members = getMembersWithIDs(memberIDs);
-			channel.removeMembers(members);
+			User member = getMember(memberID);
+			channel.removeMember(member);
 		} else {
 			// exception
 		}
@@ -115,11 +115,11 @@ public class Team {
 	}
 
 	public void addMeetingChannel(Channel newChannel) {
+		newChannel.setMembers(getMembers());
 		channels.add(newChannel);
 	}
 
 	public Channel removeMeetingChannel(String channelName) throws IllegalArgumentException {
-
 		Channel channel = getChannel(channelName);
 		if (channel == null)
 			throw new IllegalArgumentException("Channel does not exist with given channel name");
@@ -219,19 +219,6 @@ public class Team {
 			}
 		}
 		return null;
-	}
-
-	public List<User> getMembersWithIDs(int[] memberIDs) {
-		List<User> members = getMembers();
-		List<User> membersToReturn = new ArrayList<User>();
-		for (User user : members) {
-			for (int i = 0; i < memberIDs.length; i++) {
-				if (user.getUserID() == memberIDs[i]) {
-					membersToReturn.add(user);
-				}
-			}
-		}
-		return membersToReturn;
 	}
 
 	public List<User> getMembers() {

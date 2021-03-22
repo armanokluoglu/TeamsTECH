@@ -10,6 +10,8 @@ import utilities.*;
 public class Mediator implements IMediator {
 
 	private User currentUser;
+	private Team currentTeam;
+	private Channel currentChannel;
 	private List<Team> teams;
 	private List<User> users;
 	private InputOutputOperations io;
@@ -114,14 +116,14 @@ public class Mediator implements IMediator {
 	}
 
 	@Override
-	public Team addMembersToPrivateChannelOfTeam(Team team, int channelID, int[] memberIDs) {
-		team.addMembersToPrivateChannel(channelID, memberIDs);
+	public Team addMemberToPrivateChannelOfTeam(Team team, int channelID, int memberID) {
+		team.addMemberToPrivateChannel(channelID, memberID);
 		return team;
 	}
 
 	@Override
-	public Team removeMembersFromPrivateChannelOfTeam(Team team, int channelID, int[] memberIDs) {
-		team.removeMembersFromPrivateChannel(channelID, memberIDs);
+	public Team removeMemberFromPrivateChannelOfTeam(Team team, int channelID, int memberID) {
+		team.removeMemberFromPrivateChannel(channelID, memberID);
 		return team;
 	}
 
@@ -133,7 +135,7 @@ public class Mediator implements IMediator {
 
 	@Override
 	public Channel addMeetingChannelToTeam(Team team, String channelName, Date meetingDate) {
-		Channel channel = new MeetingChannel(channelName, meetingDate);
+		Channel channel = new MeetingChannel(channelName, meetingDate, team.getMembers());
 		team.addMeetingChannel(channel);
 		return channel;
 	}
@@ -310,6 +312,11 @@ public class Mediator implements IMediator {
 	public boolean teamContainsUser(User user, Team team) {
 		return team.containsUser(user);
 	}
+	
+	@Override
+	public boolean channelContainsUser(User user, Channel channel) {
+		return channel.containsMember(user);
+	}
 
 	@Override
 	public boolean isUserOwnerOfTeam(User user, Team team) {
@@ -356,4 +363,23 @@ public class Mediator implements IMediator {
 		return channels;
 	}
 
+	@Override
+	public Team getCurrentTeam() {
+		return currentTeam;
+	}
+
+	@Override
+	public void setCurrentTeam(Team currentTeam) {
+		this.currentTeam = currentTeam;
+	}
+
+	@Override
+	public Channel getCurrentChannel() {
+		return currentChannel;
+	}
+
+	@Override
+	public void setCurrentChannel(Channel currentChannel) {
+		this.currentChannel = currentChannel;
+	}
 }

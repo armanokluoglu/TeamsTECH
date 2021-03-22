@@ -2,8 +2,6 @@ package domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class Channel {
 
@@ -18,7 +16,8 @@ public abstract class Channel {
 		setChannelID(channelIDCounter);
 	}
 
-	public Channel(List<User> members) {
+	public Channel(String name, List<User> members) {
+		setName(name);
 		setMembers(members);
 	}
 
@@ -43,14 +42,15 @@ public abstract class Channel {
 		this.channelID = channelID;
 	}
 
-	public void addMembers(List<User> membersToAdd) {
-		List<User> newList = Stream.concat(getMembers().stream(), membersToAdd.stream()).collect(Collectors.toList());
+	public void addMember(User member) {
+		List<User> newList = getMembers();
+		newList.add(member);
 		setMembers(newList);
 	}
 
-	public void removeMembers(List<User> membersToRemove) {
-		List<User> newList = getMembers().stream().filter(e -> !membersToRemove.contains(e))
-				.collect(Collectors.toList());
+	public void removeMember(User member) {
+		List<User> newList = getMembers();
+		newList.remove(member);
 		setMembers(newList);
 	}
 

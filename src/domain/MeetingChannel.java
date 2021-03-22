@@ -18,13 +18,13 @@ public class MeetingChannel extends Channel {
 		setMeetingDate(date);
 	}
 
-	public MeetingChannel(Date meetingDate, List<User> members) {
-		super(members);
+	public MeetingChannel(String name, Date meetingDate, List<User> members) {
+		super(name, members);
 		setMeetingDate(meetingDate);
 	}
 
 	public MeetingChannel(MeetingChannel meetingChannel) {
-		super(meetingChannel.getMembers());
+		super(meetingChannel.getName(), meetingChannel.getMembers());
 		setMeetingDate(meetingChannel.getMeetingDate());
 	}
 

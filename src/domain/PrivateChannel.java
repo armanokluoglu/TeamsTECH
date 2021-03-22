@@ -12,12 +12,12 @@ public class PrivateChannel extends Channel {
 	}
 
 	public PrivateChannel(String name, User channelOwner, List<User> members) {
-		super(members);
+		super(name, members);
 		setChannelOwner(channelOwner);
 	}
 
 	public PrivateChannel(PrivateChannel privateChannel) {
-		super(privateChannel.getMembers());
+		super(privateChannel.getName(), privateChannel.getMembers());
 		setChannelOwner(privateChannel.getChannelOwner());
 	}
 
